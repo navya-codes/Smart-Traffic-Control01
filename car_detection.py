@@ -46,7 +46,7 @@ def detect_and_count_cars(video_path):
                 # Increase the car count
                 car_count += 1
 
-        total_car_count += car_count  # ✅ Correctly update total count
+        total_car_count += car_count  # Correctly update total count
 
         # Display the current and total car count on the video
         cv2.putText(frame, f"Cars in Frame: {car_count}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
