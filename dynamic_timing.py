@@ -1,75 +1,60 @@
-import cv2
+import tkinter as tk
+from tkinter import Label
+import random
 
-# Load the video
-video_path = "videos/sample.mp4"  # Replace with the correct path
-video = cv2.VideoCapture(video_path)
+# Global variables for car count and emergency status
+car_count = 0
+emergency_detected = False
+traffic_light_state = "Red"
 
-# Background subtractor for motion detection
-bg_subtractor = cv2.createBackgroundSubtractorMOG2()
+# Function to update the traffic light and car count
+def update_traffic_light():
+    global car_count, emergency_detected, traffic_light_state
 
-# Define two regions of interest (ROI) for Directions A and B
-roi_A = (100, 200, 400, 300)  # (x, y, width, height) for Direction A
-roi_B = (500, 200, 400, 300)  # (x, y, width, height) for Direction B
+    # Simulate car detection (replace with real detection later)
+    car_count = random.randint(5, 30)  # Simulated count
 
-def detect_cars(frame, roi):
-    """ Detects and counts moving cars in a given region. """
-    x, y, w, h = roi
-    region = frame[y:y+h, x:x+w]
-    
-    # Convert to grayscale
-    gray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
-    
-    # Apply background subtraction
-    mask = bg_subtractor.apply(gray)
-    
-    # Remove noise
-    mask = cv2.medianBlur(mask, 5)
+    # Simulate emergency detection (replace with real detection later)
+    emergency_detected = random.choice([True, False])
 
-    # Detect moving objects
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    car_count = 0
-    for contour in contours:
-        if cv2.contourArea(contour) > 500:  # Ignore small movements (noise)
-            car_count += 1
+    if emergency_detected:
+        traffic_light_state = "Green (Emergency)"
+        light_canvas.config(bg="green")
+        emergency_label.config(text="🚨 Emergency Vehicle Detected!", fg="red")
+    else:
+        traffic_light_state = "Green" if car_count > 15 else "Red"
+        light_canvas.config(bg="green" if traffic_light_state == "Green" else "red")
+        emergency_label.config(text="No Emergency", fg="black")
 
-    return car_count
+    # Update labels
+    car_count_label.config(text=f"Car Count: {car_count}")
+    light_status_label.config(text=f"Traffic Light: {traffic_light_state}")
 
-def calculate_green_times(count_A, count_B):
-    """ Calculates green light duration based on car counts. """
-    total_cars = count_A + count_B
-    if total_cars == 0:
-        return 30, 30  # Default green time
-    
-    time_A = (count_A / total_cars) * 60
-    time_B = (count_B / total_cars) * 60
-    return int(time_A), int(time_B)
+    # Call the function again after 3 seconds
+    root.after(3000, update_traffic_light)
 
-# Main loop
-while video.isOpened():
-    success, frame = video.read()
-    if not success:
-        break  # Stop if the video ends
+# Create main window
+root = tk.Tk()
+root.title("Smart Traffic Control GUI")
+root.geometry("400x400")
 
-    # Detect cars in both directions
-    count_A = detect_cars(frame, roi_A)
-    count_B = detect_cars(frame, roi_B)
+# Traffic light display
+light_canvas = tk.Canvas(root, width=100, height=100, bg="red")
+light_canvas.pack(pady=20)
 
-    # Calculate green light durations
-    green_time_A, green_time_B = calculate_green_times(count_A, count_B)
+# Labels for car count and traffic light status
+car_count_label = Label(root, text="Car Count: 0", font=("Arial", 14))
+car_count_label.pack()
 
-    # Display detected car counts
-    cv2.putText(frame, f"Direction A: {count_A} cars", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-    cv2.putText(frame, f"Direction B: {count_B} cars", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-    cv2.putText(frame, f"Green A: {green_time_A}s", (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
-    cv2.putText(frame, f"Green B: {green_time_B}s", (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
+light_status_label = Label(root, text="Traffic Light: Red", font=("Arial", 14))
+light_status_label.pack()
 
-    # Show the video with car counts
-    cv2.imshow("Traffic Detection", frame)
+# Emergency vehicle status
+emergency_label = Label(root, text="No Emergency", font=("Arial", 14))
+emergency_label.pack()
 
-    if cv2.waitKey(30) & 0xFF == ord('q'):
-        break  # Exit when 'q' is pressed
+# Start updating the GUI
+update_traffic_light()
 
-video.release()
-cv2.destroyAllWindows()
-
+# Run the Tkinter event loop
+root.mainloop()
