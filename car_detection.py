@@ -1,94 +1,62 @@
 import cv2
+import numpy as np
 
-def detect_and_count_cars(video_path):
-    # Open the video file
-    video = cv2.VideoCapture(video_path)
-    if not video.isOpened():
-        print(f"Error: Could not open video {video_path}")
-        return
+# Load video
+video_path = "sample.mp4"  # Change this to your video file path
+cap = cv2.VideoCapture(video_path)
 
-    # Background subtractor to detect moving objects
-    background_subtractor = cv2.createBackgroundSubtractorMOG2(history=500, varThreshold=50, detectShadows=True)
+# Create Background Subtractor
+bg_subtractor = cv2.createBackgroundSubtractorMOG2(history=500, varThreshold=50, detectShadows=True)
 
-    # Morphological kernel for noise reduction
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+# Kernel for noise reduction
+kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
 
-    total_car_count = 0  # Total cars counted in the video
-    tracked_cars = []  # List to store positions of tracked cars
+# Car count
+total_cars = 0
+frame_count = 0
 
-    while True:
-        # Read each frame from the video
-        success, frame = video.read()
-        if not success:
-            break
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break  # Stop if the video ends
+    
+    frame_count += 1  # Track frame number
+    
+    # Convert to grayscale
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        # Resize the frame for easier processing
-        frame = cv2.resize(frame, (640, 360))
+    # Apply background subtraction
+    fgmask = bg_subtractor.apply(gray)
 
-        # Apply the background subtractor
-        mask = background_subtractor.apply(frame)
+    # Remove noise
+    fgmask = cv2.morphologyEx(fgmask, cv2.MORPH_OPEN, kernel)
 
-        # Remove noise using morphological operations
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-        mask = cv2.medianBlur(mask, 5)
+    # Find contours
+    contours, _ = cv2.findContours(fgmask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        # Find the shapes (contours) of moving objects
-        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    car_count = 0  # Cars detected in this frame
 
-        current_frame_cars = []  # Cars detected in the current frame
-
-        # Loop through all the detected contours
-        for contour in contours:
-            # Ignore small contours that might be noise
-            if cv2.contourArea(contour) < 500:
-                continue
-
-            # Get the rectangle that fits around the contour
+    for contour in contours:
+        if cv2.contourArea(contour) > 500:  # Ignore small objects
+            car_count += 1
             x, y, w, h = cv2.boundingRect(contour)
-
-            # Filter based on aspect ratio to exclude non-car objects
-            aspect_ratio = w / h
-            if 1.2 < aspect_ratio < 4.5:  # Adjusted aspect ratio for cars
-                current_frame_cars.append((x, y, w, h))
-
-        # Track cars and avoid double counting
-        for (x, y, w, h) in current_frame_cars:
-            is_new_car = True
-            for i, (tx, ty, tw, th) in enumerate(tracked_cars):
-                # Check if the current car overlaps with a tracked car
-                if abs(x - tx) < tw and abs(y - ty) < th:
-                    is_new_car = False
-                    # Update the tracked car's position
-                    tracked_cars[i] = (x, y, w, h)
-                    break
-
-            if is_new_car:
-                # Add the car to the tracked list
-                tracked_cars.append((x, y, w, h))
-                total_car_count += 1
-
-        # Draw rectangles and update the display
-        for (x, y, w, h) in current_frame_cars:
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        # Display the total car count on the video
-        cv2.putText(frame, f"Total Cars: {total_car_count}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    total_cars += car_count  # Update total count
 
-        # Show the processed frame
-        cv2.imshow("Car Detection", frame)
+    # Display frame with detections
+    cv2.putText(frame, f"Frame {frame_count}: Cars = {car_count}", (10, 50),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
+    cv2.imshow("Car Detection", frame)
+    cv2.imshow("Foreground Mask", fgmask)
 
-        # Wait for 30ms and break if 'q' is pressed
-        if cv2.waitKey(30) & 0xFF == ord('q'):
-            break
+    print(f"Frame {frame_count}: Cars detected = {car_count}")  # Debugging info
 
-    # Release the video and close all windows
-    video.release()
-    cv2.destroyAllWindows()
+    # Exit if 'q' is pressed
+    if cv2.waitKey(20) & 0xFF == ord('q'):
+        break
 
-    # Print final car count after video ends
-    print(f"Total cars detected in the entire video: {total_car_count}")
+cap.release()
+cv2.destroyAllWindows()
 
-
-# Run the function directly
-video_file = "videos/sample.mp4"  # Replace with your test video path
-detect_and_count_cars(video_file)
+print(f"Total cars detected in the entire video: {total_cars}")
