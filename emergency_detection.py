@@ -65,12 +65,28 @@ while True:
     # Resize the frame for faster processing (optional)
     frame_resized = cv2.resize(red_detected, (640, 480))
 
+    
+        
+
     # Display the results
     cv2.imshow("Flashing Red Light Detection", frame_resized)
 
     # Wait for a small period before displaying the next frame
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break
+
+
+# Function to write emergency detection status
+def update_emergency_status(detected):
+    with open("emergency_detected.txt", "w") as f:
+        f.write("1" if detected else "0")
+
+# Example usage inside detection loop:
+if red_detected.any():  # If ambulance/fire truck detected
+    update_emergency_status(True)
+else:
+    update_emergency_status(False)
+
 
 # Release resources and close windows
 cap.release()
