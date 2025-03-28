@@ -10,7 +10,6 @@ The Smart Traffic Control System is a Python-based real-time traffic management 
 ✅ Provides a Tkinter GUI with a traffic light simulation and live car count updates.
 ✅ Displays a traffic flow graph for visualization.
 
-___
 
 ## 🎯 Key Features
 
@@ -24,7 +23,6 @@ GUI with Real-time Updates – Displays the current light status, car count, and
 
 Traffic Flow Graph – Visualizes car count variations over time.
 
-___
 
 ## 🛠 Tech Stack & Libraries Used
 
@@ -38,7 +36,6 @@ Tkinter (Graphical User Interface)
 
 Matplotlib (Traffic flow graph)
 
-___
 
 ## 🚀 How to Run the Project
 
@@ -56,13 +53,11 @@ python frontend.py
 
 It will open the traffic control simulation interface.
 
-___
 
 ## 📸 Project Workflow
 
 1️⃣ Start the System → The program loads and initializes the GUI.2️⃣ Read Video Input → The system processes frames to detect cars.3️⃣ Check Emergency Vehicles → Detects flashing red/blue lights and sirens.4️⃣ Update Traffic Lights → Adjusts light timing dynamically based on car count & emergency status.5️⃣ GUI & Graph Updates → Displays real-time data, light changes, and traffic trends.
 
-___
 
 ## 🖥 Project Files & Structure
 
@@ -75,7 +70,6 @@ ___
  ┣ 📂 videos  # Sample traffic videos for testing
  ┣ 📜 README.md  # Project Documentation
 
- ---
 
 ## 📊 Traffic Light Rules
 
@@ -99,7 +93,6 @@ Emergency Vehicle Detected
 
 🟢 Green Light (Priority)
 
-___
 
 ## 📢 Future Enhancements
 
