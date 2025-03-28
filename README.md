@@ -1,6 +1,6 @@
 # 🚦 Smart Traffic Control System
 
-📌 Project Overview
+## 📌 Project Overview
 
 The Smart Traffic Control System is a Python-based real-time traffic management solution that:
 
@@ -10,9 +10,9 @@ The Smart Traffic Control System is a Python-based real-time traffic management 
 ✅ Provides a Tkinter GUI with a traffic light simulation and live car count updates.
 ✅ Displays a traffic flow graph for visualization.
 
----
+___
 
-🎯 Key Features
+## 🎯 Key Features
 
 Car Detection – Counts the number of cars using OpenCV’s background subtraction and contour detection.
 
@@ -24,9 +24,9 @@ GUI with Real-time Updates – Displays the current light status, car count, and
 
 Traffic Flow Graph – Visualizes car count variations over time.
 
----
+___
 
-🛠 Tech Stack & Libraries Used
+## 🛠 Tech Stack & Libraries Used
 
 Python (Core language)
 
@@ -38,9 +38,9 @@ Tkinter (Graphical User Interface)
 
 Matplotlib (Traffic flow graph)
 
----
+___
 
-🚀 How to Run the Project
+## 🚀 How to Run the Project
 
 🔹 1️⃣ Setup Environment
 
@@ -56,15 +56,15 @@ python frontend.py
 
 It will open the traffic control simulation interface.
 
----
+___
 
-📸 Project Workflow
+## 📸 Project Workflow
 
 1️⃣ Start the System → The program loads and initializes the GUI.2️⃣ Read Video Input → The system processes frames to detect cars.3️⃣ Check Emergency Vehicles → Detects flashing red/blue lights and sirens.4️⃣ Update Traffic Lights → Adjusts light timing dynamically based on car count & emergency status.5️⃣ GUI & Graph Updates → Displays real-time data, light changes, and traffic trends.
 
----
+___
 
-🖥 Project Files & Structure
+## 🖥 Project Files & Structure
 
 📂 stcproject01
  ┣ 📜 car_detection.py  # Detects cars from video feed
@@ -77,7 +77,7 @@ It will open the traffic control simulation interface.
 
  ---
 
-📊 Traffic Light Rules
+## 📊 Traffic Light Rules
 
 Condition
 
@@ -99,9 +99,9 @@ Emergency Vehicle Detected
 
 🟢 Green Light (Priority)
 
----
+___
 
-📢 Future Enhancements
+## 📢 Future Enhancements
 
 🔹 Add machine learning to predict congestion.🔹 Implement a web-based dashboard.🔹 Integrate IoT sensors for real-world applications.
 
