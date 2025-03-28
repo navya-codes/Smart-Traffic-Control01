@@ -75,12 +75,13 @@ def detect_and_count_cars(video_path):
         # Show processed video
         cv2.imshow("Car Detection", frame)
 
-        # Write the current car count to a file**
+        # Write the current car count to a file
         try:
             with open("car_count.txt", "w") as f:
-                f.write(str(current_car_count))  # Use global car count variable
+                f.write(str(current_car_count)) 
+                print(f"Updated car count: {current_car_count}") # Use global car count variable
         except Exception as e:
-            print("Error writing to file:", e)
+            print(f"Error writing to file:{e}")
 
 
         # Exit when 'q' is pressed
@@ -95,7 +96,7 @@ def detect_and_count_cars(video_path):
 
 
 # Run the function
-video_file = "videos/sample.mp4"  # Update with your video file path
+video_file = "videos/sample2.mp4"  # Update with your video file path
 car_count = detect_and_count_cars(video_file)
 
 # Now the car_count variable stores the count and can be used in other parts of the system
