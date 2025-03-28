@@ -20,12 +20,19 @@ flashing_threshold = 5000  # Adjust based on your testing
 frame_skip = 5  # Process every 5th frame
 frame_count = 0
 
+# Function to write emergency detection status
+def update_emergency_status(detected):
+    with open("emergency_detected.txt", "w") as f:
+        f.write("1") 
+    print("DEBUG: EMERGENCY DETECTED! file updated")
+
 # Loop to process video frames
 while True:
     ret, frame = cap.read()
 
     if not ret:  # Break if the video ends
         print("Video has ended.")
+        update_emergency_status(False)  # Reset emergency status when video ends
         break
 
     frame_count += 1
@@ -57,7 +64,10 @@ while True:
 
         # If the change is above the threshold, it's likely flashing
         if max(intensity_changes) > flashing_threshold:
-            print("Flashing red light detected!")
+            print("Flashing red light detected! 🚨")
+            update_emergency_status(True)  # Write "1" to emergency_detected.txt
+        else:
+            update_emergency_status(False)  # Write "0" if no flashing detected
 
     # Highlight the detected red area in the frame
     red_detected = cv2.bitwise_and(frame, frame, mask=red_mask)
@@ -65,28 +75,12 @@ while True:
     # Resize the frame for faster processing (optional)
     frame_resized = cv2.resize(red_detected, (640, 480))
 
-    
-        
-
     # Display the results
     cv2.imshow("Flashing Red Light Detection", frame_resized)
 
     # Wait for a small period before displaying the next frame
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break
-
-
-# Function to write emergency detection status
-def update_emergency_status(detected):
-    with open("emergency_detected.txt", "w") as f:
-        f.write("1" if detected else "0")
-
-# Example usage inside detection loop:
-if red_detected.any():  # If ambulance/fire truck detected
-    update_emergency_status(True)
-else:
-    update_emergency_status(False)
-
 
 # Release resources and close windows
 cap.release()
