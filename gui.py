@@ -17,47 +17,95 @@ def check_emergency():
     except:
         return False  # Default to False if file not found
 
-# Function to update traffic light based on car count and emergency status
-def update_traffic_light():
-    car_count = read_car_count()
-    emergency_detected = check_emergency()
-
-    if emergency_detected:
-        light_canvas.itemconfig(red_light, fill="gray")
-        light_canvas.itemconfig(green_light, fill="green")
-        status_label.config(text="Green Light - Emergency Vehicle!", fg="green")
-    elif car_count > 0:
-        light_canvas.itemconfig(red_light, fill="gray")
-        light_canvas.itemconfig(green_light, fill="green")
-        status_label.config(text="Green Light - Cars can pass", fg="green")
-    else:
-        light_canvas.itemconfig(red_light, fill="red")
-        light_canvas.itemconfig(green_light, fill="gray")
-        status_label.config(text="Red Light - Stop", fg="red")
-
-    root.after(1000, update_traffic_light)  # Update every second
-
 # GUI Setup
 root = tk.Tk()
-root.title("Traffic Light Control")
+root.title("Smart Traffic Light Control")
 
 # Canvas for traffic light
-light_canvas = tk.Canvas(root, width=100, height=200, bg="black")
+light_canvas = tk.Canvas(root, width=120, height=280, bg="black")
 light_canvas.pack(pady=20)
 
 # Traffic light circles
-red_light = light_canvas.create_oval(30, 20, 70, 60, fill="red")   # Red by default
-green_light = light_canvas.create_oval(30, 140, 70, 180, fill="gray")
+red_light = light_canvas.create_oval(30, 20, 90, 80, fill="red")  # Red by default
+yellow_light = light_canvas.create_oval(30, 100, 90, 160, fill="gray")  # Yellow
+green_light = light_canvas.create_oval(30, 180, 90, 240, fill="gray")  # Green
 
-# Label for status
-status_label = tk.Label(root, text="Red Light - Stop", font=("Arial", 14), fg="red")
+# Labels
+status_label = tk.Label(root, text="🔴 Red Light - Stop", font=("Arial", 14), fg="red")
 status_label.pack()
+
+car_count_label = tk.Label(root, text="🚗 Cars Detected: 0", font=("Arial", 14), fg="blue")
+car_count_label.pack()
+
+emergency_label = tk.Label(root, text="🚨 Emergency: No", font=("Arial", 14), fg="black")
+emergency_label.pack()
+
+# Flag to track toggling state
+toggle_state = False
+
+# Function to toggle between Yellow and Green Light
+def toggle_yellow_green():
+    global toggle_state
+
+    if toggle_state:
+        light_canvas.itemconfig(yellow_light, fill="gray")
+        light_canvas.itemconfig(green_light, fill="green")
+        status_label.config(text="🟢 Green Light - Cars can pass", fg="green")
+    else:
+        light_canvas.itemconfig(green_light, fill="gray")
+        light_canvas.itemconfig(yellow_light, fill="yellow")
+        status_label.config(text="🟡 Yellow Light - Get Ready", fg="orange")
+
+    toggle_state = not toggle_state
+    root.after(1000, toggle_yellow_green)  # Call function every second
+
+# Function to update traffic light based on car count and emergency
+def update_traffic_light():
+    global toggle_state
+
+    car_count = read_car_count()
+    emergency_detected = check_emergency()
+
+    # Debugging Prints
+    print(f"Car Count: {car_count}, Emergency: {emergency_detected}")
+
+    # Update the labels
+    car_count_label.config(text=f"🚗 Cars Detected: {car_count}")
+    emergency_label.config(text="🚨 Emergency: Yes!" if emergency_detected else "🚨 Emergency: No")
+
+    # 🚨 Emergency Vehicle Detected - Priority Green
+    if emergency_detected:
+        print("Emergency detected! Turning GREEN for priority.")
+        light_canvas.itemconfig(red_light, fill="gray")
+        light_canvas.itemconfig(yellow_light, fill="gray")
+        light_canvas.itemconfig(green_light, fill="green")
+        status_label.config(text="🚨 Green Light - Emergency Detected!", fg="green")
+
+    # 🚗 High Traffic Detected (> 5 cars) - Toggle Yellow & Green
+    elif car_count > 5:
+        print("High traffic detected! Toggling Yellow & Green.")
+        light_canvas.itemconfig(red_light, fill="gray")
+        toggle_yellow_green()  # Start toggling Yellow & Green
+
+    # 🛑 No Cars - Red Light
+    else:
+        print("No traffic! Turning RED.")
+        light_canvas.itemconfig(green_light, fill="gray")
+        light_canvas.itemconfig(yellow_light, fill="gray")
+        light_canvas.itemconfig(red_light, fill="red")
+        status_label.config(text="🔴 Red Light - Stop", fg="red")
+        toggle_state = False  # Reset toggle state
+
+    root.after(2000, update_traffic_light)  # Check every 2 seconds
 
 # Start updating traffic light
 update_traffic_light()
 
 # Run the GUI
 root.mainloop()
+
+
+
 
 
 
